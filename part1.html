@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Platform Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.3/pixi.min.js"></script>
+  <script>
+    // Create a PixiJS application
+    let app = new PIXI.Application({
+      width: 640,
+      height: 480,
+      backgroundColor: 0x1099bb
+    });
+    
+    // Add the canvas to the HTML document
+    document.body.appendChild(app.view);
+    
+    // Create the player sprite
+    let player = new PIXI.Sprite(PIXI.Texture.from('https://pixijs.io/examples/examples/assets/bunny.png'));
+    player.anchor.set(0.5);
+    player.position.set(50, 400);
+    player.vx = 0;
+    player.vy = 0;
+    player.acceleration = 0.5;
+    player.friction = 0.95;
+    player.gravity = 1;
+    app.stage.addChild(player);
+    
+    // Create the ground sprite
+    let ground = new PIXI.Graphics();
+    ground.beginFill(0x999999);
+    ground.drawRect(0, 0, app.view.width, 50);
+    ground.endFill();
+    ground.position.set(0, 480 - ground.height);
+    app.stage.addChild(ground);
+    
+    // Create the game loop
+    app.ticker.add(function(delta) {
+      // Apply friction to the player's velocity
+      player.vx *= player.friction;
+      
+      // Apply gravity to the player's velocity
+      player.vy += player.gravity;
+      
+      // Apply the player's velocity to its position
+      player.position.x += player.vx;
+      player.position.y += player.vy;
+      
+      // Check if the player is colliding with the ground
+      if (player.position.y > ground.position.y - player.height / 2) {
+        player.vy = 0;
+        player.position.y = ground.position.y - player.height / 2;
+      }
+      
+      // Handle keyboard input
+      if (keys['ArrowLeft']) {
+        player.vx -= player.acceleration;
+      }
+      if (keys['ArrowRight']) {
+        player.vx += player.acceleration;
+      }
+      if (keys['ArrowUp'] && player.vy == 0) {
+        player.vy -= 20;
+      }
+    });
+    
+    // Handle keyboard input
+    let keys = {};
+    window.addEventListener('keydown', function(event) {
+      keys[event.code] = true;
+    });
+    window.addEventListener('keyup', function(event) {
+      keys[event.code] = false;
+    });
+  </script>
+</body>
+</html>
